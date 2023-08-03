@@ -67,7 +67,7 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Animation")
 	UParticleSystem* BeginParticle;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Animation")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Animation") // To do: 기본 공격도 스킬과 같은 형태로 전환하는 것이 좋을 듯 해보인다.
 	UAnimMontage* BasicAttackMontage;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animation")

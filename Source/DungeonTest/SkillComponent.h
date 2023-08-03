@@ -26,8 +26,8 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Skill")
 	float SkillDamage;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Sound") // To do: 이것도 SkillParticles처럼 배열로 전환
-	USoundCue* SkillSound;
+	UPROPERTY(EditDefaultsOnly, Category = "Sound")
+	TArray<USoundCue*> SkillSounds;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Animation")
 	UAnimMontage* SkillMontage;

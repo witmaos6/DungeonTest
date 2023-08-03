@@ -232,7 +232,7 @@ void ABasicPlayer::ChargeAttack()
 		{
 			ServerPlayMontage(ChargeSkill->SkillMontage, FName("Attack"), 1.0f);
 			ServerSpawnParticle(ChargeSkill->SkillParticles[0], GetActorLocation(), GetActorRotation());
-			ServerPlaySound(ChargeSkill->SkillSound);
+			ServerPlaySound(ChargeSkill->SkillSounds[0]);
 			ServerApplyDamageBasic(ChargeDamage, AttackRange);
 		}
 
@@ -287,7 +287,7 @@ void ABasicPlayer::CastingAttack()
 		{
 			ServerPlayMontage(CastingSkill->SkillMontage, FName("Attack"), 1.0f);
 			ServerSpawnParticle(CastingSkill->SkillParticles[1], GetActorLocation(), GetActorRotation());
-			ServerPlaySound(CastingSkill->SkillSound);
+			ServerPlaySound(CastingSkill->SkillSounds[0]);
 			ServerApplyDamageBasic(CastingSkill->SkillDamage, 0.0f);
 		}
 
