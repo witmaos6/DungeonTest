@@ -24,6 +24,8 @@ USkillComponent::USkillComponent()
 
 	bKeyDown = false;
 	bGageIncreasing = false;
+
+	SetIsReplicatedByDefault(true);
 }
 
 // Called when the game starts
@@ -33,17 +35,19 @@ void USkillComponent::BeginPlay()
 
 	DeltaTime = GetWorld()->GetDeltaSeconds();
 
-	Owner = Cast<ABasicPlayer>(GetOwner());
+	Owner = Cast<ACharacter>(GetOwner());
+}
+
+bool USkillComponent::IsAvailable()
+{
+	return (CoolState <= 0.0f);
 }
 
 void USkillComponent::ApplyCoolDown()
 {
 	CoolState = CoolDown;
-}
 
-void USkillComponent::SetCoolTimer()
-{
-	if(Owner && CoolState >= 0.0f)
+	if (Owner && CoolState >= 0.0f)
 	{
 		Owner->GetWorldTimerManager().SetTimer(CoolTimer, this, &USkillComponent::CoolDecrease, DeltaTime, true, 0.0f);
 	}

@@ -32,6 +32,9 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Animation")
 	UAnimMontage* SkillMontage;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Animation")
+	TArray<float> AnimPlaySpeeds;
+
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Particle")
 	TArray<UParticleSystem*> SkillParticles;
 
@@ -59,16 +62,16 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Skill")
 	float GageValue;
 
-	class ABasicPlayer* Owner;
+	ACharacter* Owner;
 
 	FTimerHandle CoolTimer;
 
 	FTimerHandle GageTimer;
 
 public:
-	void ApplyCoolDown();
+	bool IsAvailable();
 
-	void SetCoolTimer();
+	void ApplyCoolDown();
 
 	void CoolDecrease();
 
