@@ -14,6 +14,7 @@ enum class ECharacterStatus : uint8
 	ECS_Move UMETA(DisplayName = "Move"),
 	ECS_Rotation UMETA(DisplayName = "Rotation"),
 	ECS_Attack UMETA(DisplayName = "Attack"),
+	ECS_Evade UMETA(DisplayName = "Evade"),
 
 	ECS_Dead UMETA(DisplayName = "Dead")
 };
@@ -99,6 +100,9 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Skill")
 	USkillComponent* CastingSkill;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Skill")
+	USkillComponent* EvadeSkill;
+
 	FTimerHandle CastingTimer;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Skill")
@@ -173,6 +177,15 @@ protected:
 
 	UFUNCTION(NetMulticast, Reliable, WithValidation)
 	void MulticastSetActorRotation(FRotator NewRotation);
+
+	void Evade();
+
+	UFUNCTION(Server, Reliable, WithValidation)
+	void ServerLaunchCharacter();
+
+	UFUNCTION(NetMulticast, Reliable, WithValidation)
+	void MulticastLaunchCharacter();
+
 public:
 	float GetHP();
 };

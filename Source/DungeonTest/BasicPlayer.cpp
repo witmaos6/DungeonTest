@@ -19,7 +19,7 @@
 // Sets default values
 ABasicPlayer::ABasicPlayer()
 {
- 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
 	SpringArmComponent = CreateDefaultSubobject<USpringArmComponent>("SpringArmComponent");
@@ -47,6 +47,7 @@ ABasicPlayer::ABasicPlayer()
 
 	ChargeSkill = CreateDefaultSubobject<USkillComponent>("ChargeSkill");
 	CastingSkill = CreateDefaultSubobject<USkillComponent>("CastingSkill");
+	EvadeSkill = CreateDefaultSubobject<USkillComponent>("EvadeSkill");
 
 	CharacterStatus = ECharacterStatus::ECS_Begin;
 
@@ -62,7 +63,7 @@ void ABasicPlayer::BeginPlay()
 	AnimInstance = GetMesh()->GetAnimInstance();
 	PlayerController = Cast<ABasicPlayerController>(GetController());
 
-	if(!HasAuthority())
+	if (!HasAuthority())
 	{
 		ServerPlayMontage(BeginMontage, FName("Begin"), 1.0f);
 
@@ -87,11 +88,11 @@ void ABasicPlayer::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	if(ChargeSkill->bGageIncreasing)
+	if (ChargeSkill->bGageIncreasing)
 	{
 		CurrentGage = ChargeSkill->GetGage();
 	}
-	else if(CastingSkill->bGageIncreasing)
+	else if (CastingSkill->bGageIncreasing)
 	{
 		CurrentGage = CastingSkill->GetGage();
 	}
@@ -115,17 +116,19 @@ void ABasicPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 
 	PlayerInputComponent->BindAction("Casting", IE_Pressed, this, &ABasicPlayer::CastingKeyDown);
 	PlayerInputComponent->BindAction("Casting", IE_Released, this, &ABasicPlayer::CastingStart);
+
+	PlayerInputComponent->BindAction("Evade", IE_Pressed, this, &ABasicPlayer::Evade);
 }
 
 void ABasicPlayer::MoveForward(float Value)
 {
-	if(CharacterStatus == ECharacterStatus::ECS_Normal || CharacterStatus == ECharacterStatus::ECS_Move)
+	if (CharacterStatus == ECharacterStatus::ECS_Normal || CharacterStatus == ECharacterStatus::ECS_Move)
 	{
 		FRotator Rotator = FRotator(0, GetControlRotation().Yaw, 0);
 		FVector Direction = FQuat(Rotator).GetForwardVector();
 
 		AddMovementInput(Direction, Value);
-	}	
+	}
 }
 
 void ABasicPlayer::MoveRight(float Value)
@@ -137,9 +140,9 @@ void ABasicPlayer::MoveRight(float Value)
 
 		AddMovementInput(Direction, Value);
 	}
-	else if(CharacterStatus == ECharacterStatus::ECS_Rotation)
+	else if (CharacterStatus == ECharacterStatus::ECS_Rotation)
 	{
-		if(!HasAuthority())
+		if (!HasAuthority())
 		{
 			FRotator Rotation = GetActorRotation();
 			Rotation.Yaw += Value * 2;
@@ -153,20 +156,20 @@ void ABasicPlayer::BasicAttack()
 	if (!bPermitAttack)
 		return;
 
-	if(!(CharacterStatus == ECharacterStatus::ECS_Normal || CharacterStatus == ECharacterStatus::ECS_Attack))
+	if (!(CharacterStatus == ECharacterStatus::ECS_Normal || CharacterStatus == ECharacterStatus::ECS_Attack))
 	{
 		return;
 	}
 
 	CharacterStatus = ECharacterStatus::ECS_Attack;
 
-	if(AnimInstance && BasicAttackMontage)
+	if (AnimInstance && BasicAttackMontage)
 	{
 		switch (AttackStatus)
 		{
 		case EAttackStatus::EAS_Normal:
 			AttackStatus = EAttackStatus::EAS_FirstAttack;
-			if(!HasAuthority())
+			if (!HasAuthority())
 			{
 				ServerPlayMontage(BasicAttackMontage, FName("FirstAttack"), 1.5f);
 				ServerApplyDamageBasic(BasicDamage, AttackRange);
@@ -202,7 +205,7 @@ void ABasicPlayer::BasicAttack()
 
 void ABasicPlayer::Charging()
 {
-	if (CharacterStatus == ECharacterStatus::ECS_Normal && ChargeSkill->GetCoolState() <= 0.0f)
+	if (CharacterStatus == ECharacterStatus::ECS_Normal && ChargeSkill->IsAvailable())
 	{
 		PlayerController->VisibleSkillGage();
 
@@ -216,7 +219,7 @@ void ABasicPlayer::Charging()
 
 		if (!HasAuthority())
 		{
-			ServerPlayMontage(ChargeSkill->SkillMontage, FName("Charging"), 0.2f);
+			ServerPlayMontage(ChargeSkill->SkillMontage, FName("Charging"), ChargeSkill->AnimPlaySpeeds[0]);
 		}
 	}
 }
@@ -230,7 +233,7 @@ void ABasicPlayer::ChargeAttack()
 		float ChargeDamage = ChargeSkill->GetChargeDamage();
 		if (!HasAuthority())
 		{
-			ServerPlayMontage(ChargeSkill->SkillMontage, FName("Attack"), 1.0f);
+			ServerPlayMontage(ChargeSkill->SkillMontage, FName("Attack"), ChargeSkill->AnimPlaySpeeds[1]);
 			ServerSpawnParticle(ChargeSkill->SkillParticles[0], GetActorLocation(), GetActorRotation());
 			ServerPlaySound(ChargeSkill->SkillSounds[0]);
 			ServerApplyDamageBasic(ChargeDamage, AttackRange);
@@ -239,23 +242,22 @@ void ABasicPlayer::ChargeAttack()
 		ChargeSkill->bKeyDown = false;
 		ChargeSkill->bGageIncreasing = false;
 		ChargeSkill->ApplyCoolDown();
-		ChargeSkill->SetCoolTimer();
 	}
 }
 
 void ABasicPlayer::CastingKeyDown()
 {
-	if(CharacterStatus == ECharacterStatus::ECS_Normal && CastingSkill->GetCoolState() <= 0.0f)
+	if (CharacterStatus == ECharacterStatus::ECS_Normal && CastingSkill->IsAvailable())
 	{
 		CharacterStatus = ECharacterStatus::ECS_Attack;
-		
+
 		CastingSkill->bKeyDown = true;
 	}
 }
 
 void ABasicPlayer::CastingStart()
 {
-	if(CastingSkill->bKeyDown)
+	if (CastingSkill->bKeyDown)
 	{
 		PlayerController->VisibleSkillGage();
 
@@ -265,9 +267,9 @@ void ABasicPlayer::CastingStart()
 		CastingSkill->bGageIncreasing = true;
 		CastingSkill->SetGageTimer();
 
-		if(!HasAuthority())
+		if (!HasAuthority())
 		{
-			ServerPlayMontage(CastingSkill->SkillMontage, FName("Casting"), 0.3f);
+			ServerPlayMontage(CastingSkill->SkillMontage, FName("Casting"), CastingSkill->AnimPlaySpeeds[0]);
 			ServerSpawnParticle(CastingSkill->SkillParticles[0], GetActorLocation(), GetActorRotation());
 		}
 
@@ -277,7 +279,7 @@ void ABasicPlayer::CastingStart()
 
 void ABasicPlayer::CastingAttack()
 {
-	if(CastingSkill->GetGage() >= CastingSkill->GetMaxGage())
+	if (CastingSkill->GetGage() >= CastingSkill->GetMaxGage())
 	{
 		PlayerController->HiddenSkillGage();
 
@@ -285,7 +287,7 @@ void ABasicPlayer::CastingAttack()
 
 		if (!HasAuthority())
 		{
-			ServerPlayMontage(CastingSkill->SkillMontage, FName("Attack"), 1.0f);
+			ServerPlayMontage(CastingSkill->SkillMontage, FName("Attack"), CastingSkill->AnimPlaySpeeds[1]);
 			ServerSpawnParticle(CastingSkill->SkillParticles[1], GetActorLocation(), GetActorRotation());
 			ServerPlaySound(CastingSkill->SkillSounds[0]);
 			ServerApplyDamageBasic(CastingSkill->SkillDamage, 0.0f);
@@ -294,7 +296,6 @@ void ABasicPlayer::CastingAttack()
 		CastingSkill->bGageIncreasing = false;
 		CastingSkill->GageInit();
 		CastingSkill->ApplyCoolDown();
-		CastingSkill->SetCoolTimer();
 	}
 }
 
@@ -402,7 +403,7 @@ void ABasicPlayer::OnHealthChanged(UHealthComponent* OwnerHealthComponent, float
 		CharacterStatus = ECharacterStatus::ECS_Dead;
 		GetMovementComponent()->StopMovementImmediately();
 		DisableInput(PlayerController);
-		if(HasAuthority())
+		if (HasAuthority())
 		{
 			MulticastPlayMontage(DeathMontage, FName("Death"), 0.5f);
 		}
@@ -426,6 +427,45 @@ void ABasicPlayer::MulticastSetActorRotation_Implementation(FRotator NewRotation
 }
 
 bool ABasicPlayer::MulticastSetActorRotation_Validate(FRotator NewRotation)
+{
+	return true;
+}
+
+void ABasicPlayer::Evade()
+{
+	if (EvadeSkill->IsAvailable() && CharacterStatus != ECharacterStatus::ECS_Begin)
+	{
+		CharacterStatus = ECharacterStatus::ECS_Evade;
+
+		if (!HasAuthority())
+		{
+			ServerPlayMontage(EvadeSkill->SkillMontage, FName("Evade"), EvadeSkill->AnimPlaySpeeds[0]);
+			ServerLaunchCharacter();
+		}
+
+		EvadeSkill->ApplyCoolDown();
+	}
+}
+
+void ABasicPlayer::ServerLaunchCharacter_Implementation()
+{
+	MulticastLaunchCharacter();
+}
+
+bool ABasicPlayer::ServerLaunchCharacter_Validate()
+{
+	return true;
+}
+
+void ABasicPlayer::MulticastLaunchCharacter_Implementation()
+{
+	const FRotator Rotation = GetCharacterMovement()->GetLastUpdateRotation();
+	const FRotator YawRotation(0, Rotation.Yaw, 0);
+	const FVector Direction = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
+	LaunchCharacter(Direction * 3000, true, false);
+}
+
+bool ABasicPlayer::MulticastLaunchCharacter_Validate()
 {
 	return true;
 }
