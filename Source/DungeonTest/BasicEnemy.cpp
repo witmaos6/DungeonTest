@@ -30,7 +30,6 @@ ABasicEnemy::ABasicEnemy()
 
 	Damage = 10.0f;
 	AttackRadius = 50.0f;
-	AttackDelay = 1.0f;
 	AttackRange = 150.0f;
 	bAttacking = false;
 }

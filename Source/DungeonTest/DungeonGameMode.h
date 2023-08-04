@@ -30,6 +30,9 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "GameMode")
 	bool bSpawnBoss;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "GameMode")
+	TSubclassOf<AActor> BossSpawnLocation;
+
 public:
 	ADungeonGameMode();
 
