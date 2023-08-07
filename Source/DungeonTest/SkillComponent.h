@@ -26,6 +26,9 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Skill")
 	float SkillDamage;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Skill")
+	float AttackRadius;
+
 	UPROPERTY(EditDefaultsOnly, Category = "Sound")
 	TArray<USoundCue*> SkillSounds;
 
@@ -62,6 +65,9 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Skill")
 	float GageValue;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Skill")
+	float RequireMana;
+
 	ACharacter* Owner;
 
 	FTimerHandle CoolTimer;
@@ -88,4 +94,6 @@ public:
 	FORCEINLINE float GetMaxGage() { return MaxGage; }
 
 	FORCEINLINE float GetGage() { return Gage; }
+
+	FORCEINLINE float GetRequireMana() { return RequireMana; }
 };

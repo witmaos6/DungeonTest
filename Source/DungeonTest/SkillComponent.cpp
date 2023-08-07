@@ -4,6 +4,7 @@
 #include "SkillComponent.h"
 
 #include "BasicPlayer.h"
+#include "MPComponent.h"
 
 // Sets default values for this component's properties
 USkillComponent::USkillComponent()
@@ -25,6 +26,9 @@ USkillComponent::USkillComponent()
 	bKeyDown = false;
 	bGageIncreasing = false;
 
+	RequireMana = 5.0f;
+	AttackRadius = 300.0f;
+
 	SetIsReplicatedByDefault(true);
 }
 
@@ -40,6 +44,11 @@ void USkillComponent::BeginPlay()
 
 bool USkillComponent::IsAvailable()
 {
+	UMPComponent* OwnerMPComponent = Cast<UMPComponent>(Owner->GetComponentByClass(UMPComponent::StaticClass()));
+	if(OwnerMPComponent)
+	{
+		return (CoolState <= 0.0f && OwnerMPComponent->GetMana() >= RequireMana);
+	}
 	return (CoolState <= 0.0f);
 }
 

@@ -53,6 +53,9 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	class UHealthComponent* HealthComponent;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
+	class UMPComponent* MPComponent;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "State")
 	ECharacterStatus CharacterStatus;
 
@@ -163,9 +166,9 @@ protected:
 	void MulticastPlaySound(USoundCue* SoundCue);
 
 	UFUNCTION(Server, Reliable, WithValidation)
-	void ServerApplyDamageBasic(float Damage, float Distance);
+	void ServerApplyDamageBasic(float Damage, float Distance, float Radius);
 
-	void ApplyDamageBasic(float Damage, float Distance);
+	void ApplyDamageBasic(float Damage, float Distance, float Radius);
 
 	FVector GetAttackRangeFromFront(float Distance);
 

@@ -10,6 +10,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "HealthComponent.h"
+#include "MPComponent.h"
 #include "SkillComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Engine/SkeletalMeshSocket.h"
@@ -39,6 +40,8 @@ ABasicPlayer::ABasicPlayer()
 
 	HealthComponent = CreateDefaultSubobject<UHealthComponent>("HealthComponent");
 	HealthComponent->TeamNumber = ETeamNumber::ETN_Player;
+
+	MPComponent = CreateDefaultSubobject<UMPComponent>("MPComponent");
 
 	AttackRadius = 300.0f;
 	AttackRange = 200.0f;
@@ -172,7 +175,7 @@ void ABasicPlayer::BasicAttack()
 			if (!HasAuthority())
 			{
 				ServerPlayMontage(BasicAttackMontage, FName("FirstAttack"), 1.5f);
-				ServerApplyDamageBasic(BasicDamage, AttackRange);
+				ServerApplyDamageBasic(BasicDamage, AttackRange, AttackRadius);
 				ServerPlaySound(BasicAttackSound);
 			}
 			break;
@@ -182,7 +185,7 @@ void ABasicPlayer::BasicAttack()
 			if (!HasAuthority())
 			{
 				ServerPlayMontage(BasicAttackMontage, FName("SecondAttack"), 1.5f);
-				ServerApplyDamageBasic(BasicDamage, AttackRange);
+				ServerApplyDamageBasic(BasicDamage, AttackRange, AttackRadius);
 				ServerPlaySound(BasicAttackSound);
 			}
 			break;
@@ -192,7 +195,7 @@ void ABasicPlayer::BasicAttack()
 			if (!HasAuthority())
 			{
 				ServerPlayMontage(BasicAttackMontage, FName("ThirdAttack"), 1.5f);
-				ServerApplyDamageBasic(BasicDamage, AttackRange);
+				ServerApplyDamageBasic(BasicDamage, AttackRange, AttackRadius);
 				ServerPlaySound(BasicAttackSound);
 			}
 			break;
@@ -236,12 +239,14 @@ void ABasicPlayer::ChargeAttack()
 			ServerPlayMontage(ChargeSkill->SkillMontage, FName("Attack"), ChargeSkill->AnimPlaySpeeds[1]);
 			ServerSpawnParticle(ChargeSkill->SkillParticles[0], GetActorLocation(), GetActorRotation());
 			ServerPlaySound(ChargeSkill->SkillSounds[0]);
-			ServerApplyDamageBasic(ChargeDamage, AttackRange);
+			ServerApplyDamageBasic(ChargeDamage, AttackRange, ChargeSkill->AttackRadius);
 		}
 
 		ChargeSkill->bKeyDown = false;
 		ChargeSkill->bGageIncreasing = false;
 		ChargeSkill->ApplyCoolDown();
+
+		MPComponent->ReduceMana(ChargeSkill->GetRequireMana());
 	}
 }
 
@@ -290,12 +295,14 @@ void ABasicPlayer::CastingAttack()
 			ServerPlayMontage(CastingSkill->SkillMontage, FName("Attack"), CastingSkill->AnimPlaySpeeds[1]);
 			ServerSpawnParticle(CastingSkill->SkillParticles[1], GetActorLocation(), GetActorRotation());
 			ServerPlaySound(CastingSkill->SkillSounds[0]);
-			ServerApplyDamageBasic(CastingSkill->SkillDamage, 0.0f);
+			ServerApplyDamageBasic(CastingSkill->SkillDamage, 0.0f, CastingSkill->AttackRadius);
 		}
 
 		CastingSkill->bGageIncreasing = false;
 		CastingSkill->GageInit();
 		CastingSkill->ApplyCoolDown();
+
+		MPComponent->ReduceMana(CastingSkill->GetRequireMana());
 	}
 }
 
@@ -370,21 +377,21 @@ bool ABasicPlayer::MulticastPlaySound_Validate(USoundCue* SoundCue)
 	return true;
 }
 
-void ABasicPlayer::ServerApplyDamageBasic_Implementation(float Damage, float Distance)
+void ABasicPlayer::ServerApplyDamageBasic_Implementation(float Damage, float Distance, float Radius)
 {
-	ApplyDamageBasic(Damage, Distance);
+	ApplyDamageBasic(Damage, Distance, Radius);
 }
 
-bool ABasicPlayer::ServerApplyDamageBasic_Validate(float Damage, float Distance)
+bool ABasicPlayer::ServerApplyDamageBasic_Validate(float Damage, float Distance, float Radius)
 {
 	return true;
 }
 
-void ABasicPlayer::ApplyDamageBasic(float Damage, float Distance)
+void ABasicPlayer::ApplyDamageBasic(float Damage, float Distance, float Radius)
 {
 	FVector Range = GetAttackRangeFromFront(Distance);
-	UGameplayStatics::ApplyRadialDamage(this, Damage, Range, AttackRadius, PlayerDamageType, AttackIgnoreActor, this, GetInstigatorController(), true);
-	DrawDebugSphere(GetWorld(), Range, AttackRadius, 12, FColor::Red, false, 1.0f);
+	UGameplayStatics::ApplyRadialDamage(this, Damage, Range, Radius, PlayerDamageType, AttackIgnoreActor, this, GetInstigatorController(), true);
+	DrawDebugSphere(GetWorld(), Range, Radius, 12, FColor::Red, false, 1.0f);
 }
 
 FVector ABasicPlayer::GetAttackRangeFromFront(float Distance)
@@ -442,8 +449,9 @@ void ABasicPlayer::Evade()
 			ServerPlayMontage(EvadeSkill->SkillMontage, FName("Evade"), EvadeSkill->AnimPlaySpeeds[0]);
 			ServerLaunchCharacter();
 		}
-
 		EvadeSkill->ApplyCoolDown();
+
+		MPComponent->ReduceMana(EvadeSkill->GetRequireMana());
 	}
 }
 
