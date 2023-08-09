@@ -106,6 +106,9 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Skill")
 	USkillComponent* EvadeSkill;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Skill")
+	USkillComponent* FreezeSkill;
+
 	FTimerHandle CastingTimer;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Skill")
@@ -123,7 +126,6 @@ public:
 
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
-
 
 protected:
 	void MoveForward(float Value);
@@ -146,6 +148,8 @@ protected:
 	void SetCurrentMaxGage(float SetGage);
 
 	float GetCurrentGage();
+
+	void FreezeAttack();
 
 	UFUNCTION(Server, Reliable, WithValidation, BlueprintCallable)
 	void ServerPlayMontage(UAnimMontage* AnimMontage, FName SectionName, float PlaySpeed);

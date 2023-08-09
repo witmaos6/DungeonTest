@@ -244,6 +244,7 @@ void ABasicEnemy::OnHealthChanged(UHealthComponent* OwnerHealthComponent, float 
 	{
 		EnemyStatus = EEnemyStatus::EES_Stiffen;
 
+		GetMovementComponent()->StopMovementImmediately();
 		MulticastMontagePlay(DamagedMontage, FName("Stiffen"), 0.5f);
 	}
 }

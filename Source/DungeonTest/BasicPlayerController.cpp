@@ -9,11 +9,13 @@ void ABasicPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
 
-	if(!HasAuthority())
-	{	
+	if (!HasAuthority())
+	{
 		SetDisplay(WBPMainUI, &MainUI, ESlateVisibility::Visible);
 
 		SetDisplay(WBPSkillGage, &SkillGage, ESlateVisibility::Hidden);
+
+		SetDisplay(WBPBossHealthBar, &BossHealthBar, ESlateVisibility::Hidden);
 	}
 }
 
@@ -36,20 +38,29 @@ void ABasicPlayerController::DisplayUI(UUserWidget* Widget, ESlateVisibility Set
 
 void ABasicPlayerController::VisibleSkillGage()
 {
-	if(SkillGage)
+	if (SkillGage)
 	{
 		SkillGage->SetVisibility(ESlateVisibility::Visible);
-	}
-	else
-	{
-		GEngine->AddOnScreenDebugMessage(1, 1.0f, FColor::Yellow, "Don't Assign SkillGage");
 	}
 }
 
 void ABasicPlayerController::HiddenSkillGage()
 {
-	if(SkillGage)
+	if (SkillGage)
 	{
 		SkillGage->SetVisibility(ESlateVisibility::Hidden);
+	}
+}
+
+void ABasicPlayerController::VisibleBossHealthBar()
+{
+	if(BossHealthBar)
+	{
+		BossHealthBar->SetVisibility(ESlateVisibility::Visible);
+	}
+	else
+	{
+		GEngine->AddOnScreenDebugMessage(1, 2.0f, FColor::Red, "Don't Assign BossHealthBar");
+		SetDisplay(WBPBossHealthBar, &BossHealthBar, ESlateVisibility::Visible);
 	}
 }

@@ -40,6 +40,8 @@ public:
 
 	virtual void Tick(float DeltaSeconds) override;
 
+	bool GetSpawnBoss() { return bSpawnBoss; }
+
 protected:
 
 	UFUNCTION(BlueprintImplementableEvent, Category = "GameMode")

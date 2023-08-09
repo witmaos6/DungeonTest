@@ -15,7 +15,7 @@ class DUNGEONTEST_API ABasicPlayerController : public APlayerController
 	GENERATED_BODY()
 
 public:
-
+	
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Widget")
 	TSubclassOf<UUserWidget> WBPMainUI;
@@ -29,6 +29,15 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Widget")
 	UUserWidget* SkillGage;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Widget")
+	TSubclassOf<UUserWidget> WBPBossHealthBar;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Widget")
+	UUserWidget* BossHealthBar;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Widget")
+	class ABossEnemy* BossEnemy;
+	
 protected:
 	virtual void BeginPlay() override;
 
@@ -40,4 +49,8 @@ public:
 	void VisibleSkillGage();
 
 	void HiddenSkillGage();
+
+	FORCEINLINE void SetBossEnemy(ABossEnemy* Boss) { BossEnemy = Boss; }
+
+	void VisibleBossHealthBar();
 };

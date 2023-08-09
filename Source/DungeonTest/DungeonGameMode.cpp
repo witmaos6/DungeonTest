@@ -4,9 +4,11 @@
 #include "DungeonGameMode.h"
 
 #include "BasicEnemy.h"
+#include "BasicPlayerController.h"
 #include "DungeonState.h"
 #include "EngineUtils.h"
 #include "HealthComponent.h"
+#include "Kismet/GameplayStatics.h"
 
 ADungeonGameMode::ADungeonGameMode()
 {

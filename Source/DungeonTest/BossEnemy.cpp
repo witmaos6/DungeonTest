@@ -3,7 +3,10 @@
 
 #include "BossEnemy.h"
 
+#include "BasicPlayerController.h"
+#include "EngineUtils.h"
 #include "HealthComponent.h"
+#include "Blueprint/UserWidget.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
@@ -50,6 +53,15 @@ void ABossEnemy::BeginPlay()
 	if(HasAuthority())
 	{
 		MulticastMontagePlay(BeginMontage, FName("Begin"), 1.0f);
+	}
+
+	if(!HasAuthority())
+	{
+		for(ABasicPlayerController* It : TActorRange<ABasicPlayerController>(GetWorld()))
+		{
+			It->SetBossEnemy(this);
+			It->VisibleBossHealthBar();
+		}
 	}
 }
 
