@@ -28,6 +28,7 @@ USkillComponent::USkillComponent()
 
 	RequireMana = 5.0f;
 	AttackRadius = 300.0f;
+	AttackDistance = 200.0f;
 
 	SetIsReplicatedByDefault(true);
 }

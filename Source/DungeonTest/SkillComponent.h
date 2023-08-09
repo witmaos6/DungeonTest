@@ -29,6 +29,9 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Skill")
 	float AttackRadius;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Skill")
+	float AttackDistance;
+
 	UPROPERTY(EditDefaultsOnly, Category = "Sound")
 	TArray<USoundCue*> SkillSounds;
 
