@@ -183,6 +183,11 @@ void ABossEnemy::OnHealthChanged(UHealthComponent* OwnerHealthComponent, float H
 		MulticastMontagePlay(DeathMontage, FName("Death"), 1.0f);
 
 		SetLifeSpan(2.5f);
+
+		for (ABasicPlayerController* It : TActorRange<ABasicPlayerController>(GetWorld()))
+		{
+			It->HiddenBossHealthBar();
+		}
 	}
 }
 

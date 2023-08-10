@@ -53,4 +53,6 @@ public:
 	FORCEINLINE void SetBossEnemy(ABossEnemy* Boss) { BossEnemy = Boss; }
 
 	void VisibleBossHealthBar();
+
+	void HiddenBossHealthBar();
 };

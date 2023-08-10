@@ -64,3 +64,11 @@ void ABasicPlayerController::VisibleBossHealthBar()
 		SetDisplay(WBPBossHealthBar, &BossHealthBar, ESlateVisibility::Visible);
 	}
 }
+
+void ABasicPlayerController::HiddenBossHealthBar()
+{
+	if(BossHealthBar)
+	{
+		BossHealthBar->SetVisibility(ESlateVisibility::Hidden);
+	}
+}

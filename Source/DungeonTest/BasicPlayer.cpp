@@ -413,7 +413,6 @@ void ABasicPlayer::ApplyDamageBasic(float Damage, float Distance, float Radius)
 {
 	FVector Range = GetAttackRangeFromFront(Distance);
 	UGameplayStatics::ApplyRadialDamage(this, Damage, Range, Radius, PlayerDamageType, AttackIgnoreActor, this, GetInstigatorController(), true);
-	DrawDebugSphere(GetWorld(), Range, Radius, 12, FColor::Red, false, 1.0f);
 }
 
 FVector ABasicPlayer::GetAttackRangeFromFront(float Distance)
