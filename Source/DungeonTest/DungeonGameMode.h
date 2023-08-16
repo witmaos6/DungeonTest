@@ -2,12 +2,12 @@
 
 #pragma once
 
+#include "DungeonState.h"
 #include "CoreMinimal.h"
 #include "GameFramework/GameModeBase.h"
 #include "DungeonGameMode.generated.h"
 
-
-enum class EWaveState : uint8;
+//enum class EWaveState : uint8;
 /**
  * 
  */
@@ -18,7 +18,7 @@ class DUNGEONTEST_API ADungeonGameMode : public AGameModeBase
 	GENERATED_BODY()
 
 protected:
-	int32 SpawnTime;
+	int32 CurrentSpawnTime;
 
 	FTimerHandle SpawnTimer;
 
@@ -32,6 +32,15 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "GameMode")
 	TSubclassOf<AActor> BossSpawnLocation;
+
+	UPROPERTY(EditDefaultsOnly, Category = "GameMode")
+	TMap<EWaveState, int32> NrOfSpawnEnemiesMin;
+
+	UPROPERTY(EditDefaultsOnly, Category = "GameMode")
+	TMap<EWaveState, int32> NrOfSpawnEnemiesMax;
+
+	UPROPERTY(EditDefaultsOnly, Category = "GameMode")
+	TMap<EWaveState, int32> NrOfSpawnTimes;
 
 public:
 	ADungeonGameMode();

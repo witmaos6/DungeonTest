@@ -3,12 +3,10 @@
 
 #include "DungeonGameMode.h"
 
-#include "BasicEnemy.h"
-#include "BasicPlayerController.h"
 #include "DungeonState.h"
+#include "BasicEnemy.h"
 #include "EngineUtils.h"
 #include "HealthComponent.h"
-#include "Kismet/GameplayStatics.h"
 
 ADungeonGameMode::ADungeonGameMode()
 {
@@ -17,12 +15,24 @@ ADungeonGameMode::ADungeonGameMode()
 
 	GameStateClass = ADungeonState::StaticClass();
 
-	SpawnTime = 0;
+	CurrentSpawnTime = 0;
 	SpawnDelay = 5.0f;
 
 	CurrentState = EWaveState::FirstWave;
 
 	bSpawnBoss = false;
+
+	NrOfSpawnEnemiesMin.Add(EWaveState::FirstWave, 4);
+	NrOfSpawnEnemiesMin.Add(EWaveState::SecondWave, 15);
+	NrOfSpawnEnemiesMin.Add(EWaveState::BossWave, 1);
+
+	NrOfSpawnEnemiesMax.Add(EWaveState::FirstWave, 5);
+	NrOfSpawnEnemiesMax.Add(EWaveState::SecondWave, 20);
+	NrOfSpawnEnemiesMax.Add(EWaveState::BossWave, 3);
+
+	NrOfSpawnTimes.Add(EWaveState::FirstWave, 4);
+	NrOfSpawnTimes.Add(EWaveState::SecondWave, 6);
+	NrOfSpawnTimes.Add(EWaveState::BossWave, 10);
 }
 
 void ADungeonGameMode::StartPlay()
@@ -64,10 +74,10 @@ void ADungeonGameMode::Tick(float DeltaSeconds)
 
 void ADungeonGameMode::StartWave()
 {
-	SpawnTime++;
-	if(SpawnTime >= GetSpawnTime())
+	CurrentSpawnTime++;
+	if(CurrentSpawnTime >= GetSpawnTime())
 	{
-		SpawnTime = 0;
+		CurrentSpawnTime = 0;
 		GetWorldTimerManager().ClearTimer(SpawnTimer);
 		return;
 	}
@@ -81,42 +91,12 @@ void ADungeonGameMode::StartWave()
 
 int32 ADungeonGameMode::GetSpawnTime()
 {
-	int32 Result = 1;
-
-	if (CurrentState == EWaveState::FirstWave)
-	{
-		Result = 4;
-	}
-	else if (CurrentState == EWaveState::SecondWave)
-	{
-		Result = 6;
-	}
-	else if(CurrentState == EWaveState::BossWave)
-	{
-		Result = 10;
-	}
-
-	return Result;
+	return NrOfSpawnTimes[CurrentState];
 }
 
 int32 ADungeonGameMode::GetNrOfSpawnEnemies()
 {
-	int32 Result = 0;
-
-	if(CurrentState == EWaveState::FirstWave)
-	{
-		Result = FMath::RandRange(4, 5);
-	}
-	else if(CurrentState == EWaveState::SecondWave)
-	{
-		Result = FMath::RandRange(15, 20);
-	}
-	else if(CurrentState == EWaveState::BossWave)
-	{
-		Result = FMath::RandRange(1, 3);
-	}
-
-	return Result;
+	return FMath::RandRange(NrOfSpawnEnemiesMin[CurrentState], NrOfSpawnEnemiesMax[CurrentState]);
 }
 
 bool ADungeonGameMode::bRemainEnemies()

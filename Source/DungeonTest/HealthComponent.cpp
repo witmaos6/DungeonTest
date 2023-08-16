@@ -46,7 +46,7 @@ void UHealthComponent::HandleTakeAnyDamage(AActor* DamagedActor, float Damage, c
 		return;
 	}
 
-	Health = FMath::Clamp(Health - Damage, 0.0f, DefaultHealth);
+	Health -= Damage;
 
 	OnHealthChanged.Broadcast(this, Health, Damage, DamageType, InstigatedBy, DamageCauser);
 }

@@ -116,4 +116,7 @@ protected:
 
 	UFUNCTION()
 	void OnHealthChanged(UHealthComponent* OwnerHealthComponent, float Health, float HealthDelta, const UDamageType* DamageType, AController* InstigatedBy, AActor* DamageCauser);
+
+	UFUNCTION(BlueprintImplementableEvent, Category = "Widget")
+	void PrintDamageText(float AppliedDamage);
 };

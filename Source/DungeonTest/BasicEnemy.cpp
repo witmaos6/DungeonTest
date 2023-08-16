@@ -5,6 +5,7 @@
 
 #include "AIController.h"
 #include "BasicPlayer.h"
+#include "DrawDebugHelpers.h"
 #include "EngineUtils.h"
 #include "HealthComponent.h"
 #include "Components/CapsuleComponent.h"
@@ -228,7 +229,9 @@ void ABasicEnemy::EndAttack()
 }
 
 void ABasicEnemy::OnHealthChanged(UHealthComponent* OwnerHealthComponent, float Health, float HealthDelta, const UDamageType* DamageType, AController* InstigatedBy, AActor* DamageCauser)
-{
+{	
+	PrintDamageText(-HealthDelta);
+
 	if (Health <= 0.0f && EnemyStatus != EEnemyStatus::EES_Dead)
 	{
 		EnemyStatus = EEnemyStatus::EES_Dead;
