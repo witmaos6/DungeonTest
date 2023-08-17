@@ -51,9 +51,9 @@ void UHealthComponent::HandleTakeAnyDamage(AActor* DamagedActor, float Damage, c
 	OnHealthChanged.Broadcast(this, Health, Damage, DamageType, InstigatedBy, DamageCauser);
 }
 
-void UHealthComponent::OnRep_Health(float OldHealth)
+void UHealthComponent::OnRep_Health(float NewHealth)
 {
-	float Damage = Health - OldHealth;
+	float Damage = Health - NewHealth;
 
 	OnHealthChanged.Broadcast(this, Health, Damage, nullptr, nullptr, nullptr);
 }

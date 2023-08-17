@@ -12,6 +12,8 @@
 #include "GameFramework/PawnMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Sound/SoundCue.h"
+#include "BasicPlayerController.h"
+#include "BasicPlayer.h"
 
 // Sets default values
 ABasicEnemy::ABasicEnemy()
@@ -230,7 +232,18 @@ void ABasicEnemy::EndAttack()
 
 void ABasicEnemy::OnHealthChanged(UHealthComponent* OwnerHealthComponent, float Health, float HealthDelta, const UDamageType* DamageType, AController* InstigatedBy, AActor* DamageCauser)
 {	
-	PrintDamageText(-HealthDelta);
+	if (HasAuthority())
+	{
+		ABasicPlayer* CauserPlayer = Cast<ABasicPlayer>(DamageCauser);
+		if (CauserPlayer)
+		{
+			ABasicPlayerController* PC = Cast<ABasicPlayerController>(CauserPlayer->GetController());
+			if (PC)
+			{
+				PC->PrintDamageText(GetActorLocation(), HealthDelta);
+			}
+		}
+	}
 
 	if (Health <= 0.0f && EnemyStatus != EEnemyStatus::EES_Dead)
 	{

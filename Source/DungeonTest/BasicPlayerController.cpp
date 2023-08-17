@@ -60,7 +60,6 @@ void ABasicPlayerController::VisibleBossHealthBar()
 	}
 	else
 	{
-		GEngine->AddOnScreenDebugMessage(1, 2.0f, FColor::Red, "Don't Assign BossHealthBar");
 		SetDisplay(WBPBossHealthBar, &BossHealthBar, ESlateVisibility::Visible);
 	}
 }
@@ -71,4 +70,17 @@ void ABasicPlayerController::HiddenBossHealthBar()
 	{
 		BossHealthBar->SetVisibility(ESlateVisibility::Hidden);
 	}
+}
+
+void ABasicPlayerController::PrintDamageText_Implementation(const FVector& Location, float AppliedDamage)
+{
+	if (!HasAuthority())
+	{
+		BPPrintDamageText(Location, AppliedDamage);
+	}
+}
+
+bool ABasicPlayerController::PrintDamageText_Validate(const FVector& Location, float AppliedDamage)
+{
+	return true;
 }

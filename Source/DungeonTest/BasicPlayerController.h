@@ -37,6 +37,12 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Widget")
 	class ABossEnemy* BossEnemy;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Widget")
+	TSubclassOf<UUserWidget> WBPDamageText;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Widget")
+	UUserWidget* DamageText;
 	
 protected:
 	virtual void BeginPlay() override;
@@ -55,4 +61,10 @@ public:
 	void VisibleBossHealthBar();
 
 	void HiddenBossHealthBar();
+
+	UFUNCTION(NetMulticast, Reliable, WithValidation)
+	void PrintDamageText(const FVector& Location, float AppliedDamage);
+
+	UFUNCTION(BlueprintImplementableEvent, Category = "Widget")
+	void BPPrintDamageText(const FVector& Location, float AppliedDamgage);
 };

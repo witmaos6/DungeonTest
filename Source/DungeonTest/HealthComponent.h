@@ -47,7 +47,7 @@ protected:
 	void HandleTakeAnyDamage(AActor* DamagedActor, float Damage, const UDamageType* DamageType, AController* InstigatedBy, AActor* DamageCauser);
 
 	UFUNCTION()
-	void OnRep_Health(float OldHealth);
+	void OnRep_Health(float NewHealth);
 
 public:
 	float GetHealth() const;
