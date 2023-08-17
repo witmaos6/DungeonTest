@@ -18,7 +18,7 @@
 // Sets default values
 ABasicEnemy::ABasicEnemy()
 {
- 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
 	HealthComponent = CreateDefaultSubobject<UHealthComponent>("HealthComponent");
@@ -46,11 +46,11 @@ void ABasicEnemy::BeginPlay()
 
 	HealthComponent->OnHealthChanged.AddDynamic(this, &ABasicEnemy::OnHealthChanged);
 
-	if(HasAuthority())
+	if (HasAuthority())
 	{
 		AttackTarget = GetNextTarget();
 	}
-	
+
 	EnemyStatus = EEnemyStatus::EES_Normal;
 
 	AttackIgnoreActor.Add(this);
@@ -105,7 +105,7 @@ void ABasicEnemy::SetTarget()
 
 void ABasicEnemy::SetAIController()
 {
-	if(AIController == nullptr)
+	if (AIController == nullptr)
 	{
 		AIController = Cast<AAIController>(GetController());
 	}
@@ -119,11 +119,11 @@ ABasicPlayer* ABasicEnemy::GetNextTarget()
 {
 	ABasicPlayer* NearestTarget = nullptr;
 	float NearestTargetDistance = FLT_MAX;
-	for(ABasicPlayer* It : TActorRange<ABasicPlayer>(GetWorld()))
+	for (ABasicPlayer* It : TActorRange<ABasicPlayer>(GetWorld()))
 	{
 		UHealthComponent* CharacterHealthComponent = Cast<UHealthComponent>(It->GetComponentByClass(UHealthComponent::StaticClass()));
 
-		if(CharacterHealthComponent && CharacterHealthComponent->GetHealth() > 0.0f)
+		if (CharacterHealthComponent && CharacterHealthComponent->GetHealth() > 0.0f)
 		{
 			float Distance = (It->GetActorLocation() - GetActorLocation()).Size();
 
@@ -135,7 +135,7 @@ ABasicPlayer* ABasicEnemy::GetNextTarget()
 		}
 	}
 
-	if(NearestTarget)
+	if (NearestTarget)
 	{
 		return NearestTarget;
 	}
@@ -146,7 +146,7 @@ void ABasicEnemy::MoveToTarget()
 {
 	EnemyStatus = EEnemyStatus::EES_Move;
 
-	if(AttackTarget && AIController)
+	if (AttackTarget && AIController)
 	{
 		FAIMoveRequest MoveRequest;
 		MoveRequest.SetGoalActor(AttackTarget);
@@ -159,12 +159,12 @@ void ABasicEnemy::MoveToTarget()
 void ABasicEnemy::BasicAttack()
 {
 	bAttacking = true;
-	if(AIController)
+	if (AIController)
 	{
 		AIController->StopMovement();
 	}
 
-	if(HasAuthority())
+	if (HasAuthority())
 	{
 		MulticastMontagePlay(BasicAttackMontage, FName("BasicAttack"), 1.0f);
 	}
@@ -197,8 +197,8 @@ bool ABasicEnemy::MulticastSoundPlay_Validate(USoundCue* SoundCue)
 }
 
 void ABasicEnemy::BPApplyDamage()
-{	
-	if(HasAuthority())
+{
+	if (HasAuthority())
 	{
 		ServerApplyDamage();
 	}
@@ -231,8 +231,8 @@ void ABasicEnemy::EndAttack()
 }
 
 void ABasicEnemy::OnHealthChanged(UHealthComponent* OwnerHealthComponent, float Health, float HealthDelta, const UDamageType* DamageType, AController* InstigatedBy, AActor* DamageCauser)
-{	
-	if (HasAuthority())
+{
+	if (HasAuthority() && EnemyStatus != EEnemyStatus::EES_Dead)
 	{
 		ABasicPlayer* CauserPlayer = Cast<ABasicPlayer>(DamageCauser);
 		if (CauserPlayer)
@@ -256,7 +256,7 @@ void ABasicEnemy::OnHealthChanged(UHealthComponent* OwnerHealthComponent, float 
 
 		SetLifeSpan(2.3f);
 	}
-	else if(Health > 0.0f)
+	else if (Health > 0.0f)
 	{
 		EnemyStatus = EEnemyStatus::EES_Stiffen;
 

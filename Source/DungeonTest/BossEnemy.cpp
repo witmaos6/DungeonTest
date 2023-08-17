@@ -13,6 +13,7 @@
 #include "GameFramework/PawnMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Sound/SoundCue.h"
+#include "BasicPlayer.h"
 
 // Sets default values
 ABossEnemy::ABossEnemy()
@@ -174,6 +175,19 @@ void ABossEnemy::EndAttack()
 
 void ABossEnemy::OnHealthChanged(UHealthComponent* OwnerHealthComponent, float Health, float HealthDelta, const UDamageType* DamageType, AController* InstigatedBy, AActor* DamageCauser)
 {
+	if (HasAuthority() && !bDead)
+	{
+		ABasicPlayer* CauserPlayer = Cast<ABasicPlayer>(DamageCauser);
+		if (CauserPlayer)
+		{
+			ABasicPlayerController* PC = Cast<ABasicPlayerController>(CauserPlayer->GetController());
+			if (PC)
+			{
+				PC->PrintDamageText(GetActorLocation(), HealthDelta);
+			}
+		}
+	}
+
 	if (Health <= 0.0f && !bDead)
 	{
 		bDead = true;
