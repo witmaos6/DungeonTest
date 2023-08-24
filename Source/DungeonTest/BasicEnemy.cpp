@@ -7,13 +7,14 @@
 #include "BasicPlayer.h"
 #include "DrawDebugHelpers.h"
 #include "EngineUtils.h"
-#include "HealthComponent.h"
+#include "Components/HealthComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/PawnMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Sound/SoundCue.h"
 #include "BasicPlayerController.h"
 #include "BasicPlayer.h"
+#include "Animation/AnimInstance.h"
 
 // Sets default values
 ABasicEnemy::ABasicEnemy()

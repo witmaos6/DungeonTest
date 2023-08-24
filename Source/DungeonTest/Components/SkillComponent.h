@@ -20,7 +20,6 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Skill")
 	bool bKeyDown;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Skill")
 	bool bGageIncreasing;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Skill")
@@ -65,8 +64,14 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Skill")
 	float Gage;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Skill")
+	UPROPERTY(EditDefaultsOnly, Category = "Skill")
+	float GageIncreasingSpeed;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Skill")
 	float GageValue;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Skill")
+	int32 GageLoops;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Skill")
 	float RequireMana;
@@ -88,9 +93,9 @@ public:
 
 	void GageIncrease();
 
-	void GageInit();
-
 	float GetChargeDamage();
+
+	FORCEINLINE float GetRequireMana() { return RequireMana; }
 
 	FORCEINLINE float GetCoolState() { return CoolState; }
 
@@ -98,5 +103,10 @@ public:
 
 	FORCEINLINE float GetGage() { return Gage; }
 
-	FORCEINLINE float GetRequireMana() { return RequireMana; }
+	FORCEINLINE float GetGageIncreasingSpeed() { return GageIncreasingSpeed; }
+
+	FORCEINLINE int32 GetGageLoops() { return GageLoops; }
+
+protected:
+	void GageInit();
 };

@@ -8,13 +8,14 @@
 #include "Camera/CameraComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
-#include "HealthComponent.h"
-#include "MPComponent.h"
-#include "SkillComponent.h"
+#include "Components/HealthComponent.h"
+#include "Components/MPComponent.h"
+#include "Components/SkillComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Engine/SkeletalMeshSocket.h"
 #include "Kismet/GameplayStatics.h"
 #include "Sound/SoundCue.h"
+#include "Animation/AnimInstance.h"
 
 // Sets default values
 ABasicPlayer::ABasicPlayer()
@@ -53,9 +54,6 @@ ABasicPlayer::ABasicPlayer()
 	FreezeSkill = CreateDefaultSubobject<USkillComponent>("FreezeSkill");
 
 	CharacterStatus = ECharacterStatus::ECS_Begin;
-
-	CurrentMaxGage = 0.0f;
-	CurrentGage = 0.0f;
 }
 
 // Called when the game starts or when spawned
@@ -91,14 +89,6 @@ void ABasicPlayer::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	if (ChargeSkill->bGageIncreasing)
-	{
-		CurrentGage = ChargeSkill->GetGage();
-	}
-	else if (CastingSkill->bGageIncreasing)
-	{
-		CurrentGage = CastingSkill->GetGage();
-	}
 }
 
 // Called to bind functionality to input
@@ -212,15 +202,14 @@ void ABasicPlayer::Charging()
 {
 	if (CharacterStatus == ECharacterStatus::ECS_Normal && ChargeSkill->IsAvailable())
 	{
-		PlayerController->VisibleSkillGage();
+		PlayerController->VisibleSkillGage(ChargeSkill->GetGageIncreasingSpeed(), ChargeSkill->GetGageLoops());
 
-		SetCurrentMaxGage(ChargeSkill->GetMaxGage());
+		ChargeSkill->SetGageTimer();
+		ChargeSkill->bGageIncreasing = true;
 
 		CharacterStatus = ECharacterStatus::ECS_Rotation;
 
 		ChargeSkill->bKeyDown = true;
-		ChargeSkill->bGageIncreasing = true;
-		ChargeSkill->SetGageTimer();
 
 		if (!HasAuthority())
 		{
@@ -233,7 +222,8 @@ void ABasicPlayer::ChargeAttack()
 {
 	if (ChargeSkill->bKeyDown)
 	{
-		PlayerController->HiddenSkillGage();
+		PlayerController->RemoveSkillGage();
+		ChargeSkill->bGageIncreasing = false;
 
 		float ChargeDamage = ChargeSkill->GetChargeDamage();
 		if (!HasAuthority())
@@ -245,7 +235,6 @@ void ABasicPlayer::ChargeAttack()
 		}
 
 		ChargeSkill->bKeyDown = false;
-		ChargeSkill->bGageIncreasing = false;
 		ChargeSkill->ApplyCoolDown();
 
 		MPComponent->ReduceMana(ChargeSkill->GetRequireMana());
@@ -266,13 +255,9 @@ void ABasicPlayer::CastingStart()
 {
 	if (CastingSkill->bKeyDown)
 	{
-		PlayerController->VisibleSkillGage();
-
-		SetCurrentMaxGage(CastingSkill->GetMaxGage());
+		PlayerController->VisibleSkillGage(CastingSkill->GetGageIncreasingSpeed(), CastingSkill->GetGageLoops());
 
 		CastingSkill->bKeyDown = false;
-		CastingSkill->bGageIncreasing = true;
-		CastingSkill->SetGageTimer();
 
 		if (!HasAuthority())
 		{
@@ -280,15 +265,15 @@ void ABasicPlayer::CastingStart()
 			ServerSpawnParticle(CastingSkill->SkillParticles[0], GetActorLocation(), GetActorRotation());
 		}
 
-		GetWorldTimerManager().SetTimer(CastingTimer, this, &ABasicPlayer::CastingAttack, 0.5f, true, 0.0f);
+		GetWorldTimerManager().SetTimer(CastingTimer, this, &ABasicPlayer::CastingAttack, CastingSkill->GetGageIncreasingSpeed());
 	}
 }
 
 void ABasicPlayer::CastingAttack()
 {
-	if (CastingSkill->GetGage() >= CastingSkill->GetMaxGage())
+	if (CastingSkill)
 	{
-		PlayerController->HiddenSkillGage();
+		PlayerController->RemoveSkillGage();
 
 		GetWorldTimerManager().ClearTimer(CastingTimer);
 
@@ -299,23 +284,10 @@ void ABasicPlayer::CastingAttack()
 			ServerPlaySound(CastingSkill->SkillSounds[0]);
 			ServerApplyDamageBasic(CastingSkill->SkillDamage, CastingSkill->AttackDistance, CastingSkill->AttackRadius);
 		}
-
-		CastingSkill->bGageIncreasing = false;
-		CastingSkill->GageInit();
 		CastingSkill->ApplyCoolDown();
 
 		MPComponent->ReduceMana(CastingSkill->GetRequireMana());
 	}
-}
-
-void ABasicPlayer::SetCurrentMaxGage(float SetGage)
-{
-	CurrentMaxGage = SetGage;
-}
-
-float ABasicPlayer::GetCurrentGage()
-{
-	return CurrentGage;
 }
 
 void ABasicPlayer::FreezeAttack()

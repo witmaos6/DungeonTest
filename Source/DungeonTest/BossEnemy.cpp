@@ -5,7 +5,7 @@
 
 #include "BasicPlayerController.h"
 #include "EngineUtils.h"
-#include "HealthComponent.h"
+#include "Components/HealthComponent.h"
 #include "Blueprint/UserWidget.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Camera/CameraComponent.h"
@@ -14,6 +14,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "Sound/SoundCue.h"
 #include "BasicPlayer.h"
+#include "Animation/AnimInstance.h"
 
 // Sets default values
 ABossEnemy::ABossEnemy()

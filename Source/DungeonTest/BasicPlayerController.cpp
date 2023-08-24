@@ -4,6 +4,7 @@
 #include "BasicPlayerController.h"
 
 #include "Blueprint/UserWidget.h"
+#include "Widget/SkillGageWidget.h"
 
 void ABasicPlayerController::BeginPlay()
 {
@@ -12,8 +13,6 @@ void ABasicPlayerController::BeginPlay()
 	if (!HasAuthority())
 	{
 		SetDisplay(WBPMainUI, &MainUI, ESlateVisibility::Visible);
-
-		SetDisplay(WBPSkillGage, &SkillGage, ESlateVisibility::Hidden);
 
 		SetDisplay(WBPBossHealthBar, &BossHealthBar, ESlateVisibility::Hidden);
 	}
@@ -36,19 +35,23 @@ void ABasicPlayerController::DisplayUI(UUserWidget* Widget, ESlateVisibility Set
 	Widget->SetVisibility(SetVisible);
 }
 
-void ABasicPlayerController::VisibleSkillGage()
+void ABasicPlayerController::VisibleSkillGage(float PlaySpeed, int32 NumLoops)
 {
-	if (SkillGage)
+	if (!HasAuthority())
 	{
+		SkillGage = CreateWidget<USkillGageWidget>(this, WBPSkillGage);
+		SkillGage->AddToViewport();
 		SkillGage->SetVisibility(ESlateVisibility::Visible);
+		
+		SkillGage->GageUp(PlaySpeed, NumLoops);		
 	}
 }
 
-void ABasicPlayerController::HiddenSkillGage()
+void ABasicPlayerController::RemoveSkillGage()
 {
 	if (SkillGage)
 	{
-		SkillGage->SetVisibility(ESlateVisibility::Hidden);
+		SkillGage->RemoveFromParent();
 	}
 }
 

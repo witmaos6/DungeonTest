@@ -111,12 +111,6 @@ protected:
 
 	FTimerHandle CastingTimer;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Skill")
-	float CurrentMaxGage;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Skill")
-	float CurrentGage;
-
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Sound")
 	USoundCue* BasicAttackSound;
 
@@ -144,10 +138,6 @@ protected:
 	void CastingStart();
 
 	void CastingAttack();
-
-	void SetCurrentMaxGage(float SetGage);
-
-	float GetCurrentGage();
 
 	void FreezeAttack();
 

@@ -26,8 +26,8 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Widget")
 	TSubclassOf<UUserWidget> WBPSkillGage;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Widget")
-	UUserWidget* SkillGage;
+	UPROPERTY(BlueprintReadOnly, Category = "Widget")
+	class USkillGageWidget* SkillGage;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Widget")
 	TSubclassOf<UUserWidget> WBPBossHealthBar;
@@ -46,9 +46,9 @@ protected:
 public:
 	void DisplayUI(UUserWidget* Widget, ESlateVisibility SetVisible);
 
-	void VisibleSkillGage();
+	void VisibleSkillGage(float PlaySpeed, int32 NumLoops);
 
-	void HiddenSkillGage();
+	void RemoveSkillGage();
 
 	FORCEINLINE void SetBossEnemy(ABossEnemy* Boss) { BossEnemy = Boss; }
 

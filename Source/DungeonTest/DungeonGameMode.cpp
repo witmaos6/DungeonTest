@@ -6,7 +6,7 @@
 #include "DungeonState.h"
 #include "BasicEnemy.h"
 #include "EngineUtils.h"
-#include "HealthComponent.h"
+#include "Components/HealthComponent.h"
 
 ADungeonGameMode::ADungeonGameMode()
 {

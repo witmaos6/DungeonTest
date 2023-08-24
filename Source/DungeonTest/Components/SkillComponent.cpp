@@ -3,8 +3,8 @@
 
 #include "SkillComponent.h"
 
-#include "BasicPlayer.h"
 #include "MPComponent.h"
+#include "GameFramework/Character.h"
 
 // Sets default values for this component's properties
 USkillComponent::USkillComponent()
@@ -16,10 +16,12 @@ USkillComponent::USkillComponent()
 	CoolDown = 10.0f;
 	CoolState = 0.0f;
 	CoolValue = 1.0f;
-
+	
 	MaxGage = 10.0f;
 	Gage = 0.0f;
 	GageValue = 10.0f;
+	GageIncreasingSpeed = 1.0f;
+	GageLoops = 1;
 
 	SkillDamage = 5.0f;
 
@@ -77,7 +79,7 @@ void USkillComponent::CoolDecrease()
 
 void USkillComponent::SetGageTimer()
 {
-	if(Owner)
+	if (Owner)
 	{
 		Owner->GetWorldTimerManager().SetTimer(GageTimer, this, &USkillComponent::GageIncrease, DeltaTime, true, 0.0f);
 	}
@@ -85,7 +87,7 @@ void USkillComponent::SetGageTimer()
 
 void USkillComponent::GageIncrease()
 {
-	if(Gage < MaxGage && bGageIncreasing)
+	if (Gage < MaxGage && bGageIncreasing)
 	{
 		Gage += GageValue * DeltaTime;
 	}
@@ -109,5 +111,6 @@ float USkillComponent::GetChargeDamage()
 		ResultDamage *= 2.0f;
 	}
 	GageInit();
+
 	return FMath::RoundToFloat(ResultDamage);
 }
