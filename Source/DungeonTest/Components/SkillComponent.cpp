@@ -15,11 +15,10 @@ USkillComponent::USkillComponent()
 
 	CoolDown = 10.0f;
 	CoolState = 0.0f;
-	CoolValue = 1.0f;
 	
 	MaxGage = 10.0f;
 	Gage = 0.0f;
-	GageValue = 10.0f;
+	GageValue = 0.0f;
 	GageIncreasingSpeed = 1.0f;
 	GageLoops = 1;
 
@@ -40,7 +39,7 @@ void USkillComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
-	DeltaTime = GetWorld()->GetDeltaSeconds();
+	GageValue = MaxGage / 5.0f;
 
 	Owner = Cast<ACharacter>(GetOwner());
 }
@@ -61,7 +60,7 @@ void USkillComponent::ApplyCoolDown()
 
 	if (Owner && CoolState >= 0.0f)
 	{
-		Owner->GetWorldTimerManager().SetTimer(CoolTimer, this, &USkillComponent::CoolDecrease, DeltaTime, true, 0.0f);
+		Owner->GetWorldTimerManager().SetTimer(CoolTimer, this, &USkillComponent::CoolDecrease, GetWorld()->GetDeltaSeconds(), true, 0.0f);
 	}
 }
 
@@ -69,7 +68,7 @@ void USkillComponent::CoolDecrease()
 {
 	if(CoolState > 0.0f)
 	{
-		CoolState -= CoolValue * DeltaTime;
+		CoolState -= GetWorld()->GetDeltaSeconds();
 	}
 	else
 	{
@@ -81,7 +80,8 @@ void USkillComponent::SetGageTimer()
 {
 	if (Owner)
 	{
-		Owner->GetWorldTimerManager().SetTimer(GageTimer, this, &USkillComponent::GageIncrease, DeltaTime, true, 0.0f);
+		float IncreasingTerm = GetReverse(GageIncreasingSpeed * 5.0f);
+		Owner->GetWorldTimerManager().SetTimer(GageTimer, this, &USkillComponent::GageIncrease, IncreasingTerm, true, 0.0f);
 	}
 }
 
@@ -89,18 +89,13 @@ void USkillComponent::GageIncrease()
 {
 	if (Gage < MaxGage && bGageIncreasing)
 	{
-		Gage += GageValue * DeltaTime;
+		Gage += GageValue;
 	}
 	else
 	{
 		bGageIncreasing = false;
 		Owner->GetWorldTimerManager().ClearTimer(GageTimer);
 	}
-}
-
-void USkillComponent::GageInit()
-{
-	Gage = 0.0f;
 }
 
 float USkillComponent::GetChargeDamage()
@@ -110,7 +105,7 @@ float USkillComponent::GetChargeDamage()
 	{
 		ResultDamage *= 2.0f;
 	}
-	GageInit();
+	Gage = 0.0f;
 
 	return FMath::RoundToFloat(ResultDamage);
 }

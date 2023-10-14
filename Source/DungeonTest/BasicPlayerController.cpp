@@ -43,7 +43,7 @@ void ABasicPlayerController::VisibleSkillGage(float PlaySpeed, int32 NumLoops)
 		SkillGage->AddToViewport();
 		SkillGage->SetVisibility(ESlateVisibility::Visible);
 		
-		SkillGage->GageUp(PlaySpeed, NumLoops);		
+		SkillGage->GageUp(PlaySpeed, NumLoops);
 	}
 }
 

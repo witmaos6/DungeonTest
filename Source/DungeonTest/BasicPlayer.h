@@ -109,6 +109,8 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Skill")
 	USkillComponent* FreezeSkill;
 
+	FTimerHandle ChargeTimer;
+
 	FTimerHandle CastingTimer;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Sound")
@@ -130,7 +132,6 @@ protected:
 
 	void Charging();
 
-	UFUNCTION(BlueprintCallable)
 	void ChargeAttack();
 
 	void CastingKeyDown();

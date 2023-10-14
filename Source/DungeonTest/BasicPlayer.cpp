@@ -215,6 +215,9 @@ void ABasicPlayer::Charging()
 		{
 			ServerPlayMontage(ChargeSkill->SkillMontage, FName("Charging"), ChargeSkill->AnimPlaySpeeds[0]);
 		}
+
+		float ForcedExcuteTime = ChargeSkill->GetExcuteTime(1.0f);
+		GetWorldTimerManager().SetTimer(ChargeTimer, this, &ABasicPlayer::ChargeAttack, ForcedExcuteTime);
 	}
 }
 
@@ -222,6 +225,8 @@ void ABasicPlayer::ChargeAttack()
 {
 	if (ChargeSkill->bKeyDown)
 	{
+		GetWorldTimerManager().ClearTimer(ChargeTimer);
+
 		PlayerController->RemoveSkillGage();
 		ChargeSkill->bGageIncreasing = false;
 
@@ -265,38 +270,35 @@ void ABasicPlayer::CastingStart()
 			ServerSpawnParticle(CastingSkill->SkillParticles[0], GetActorLocation(), GetActorRotation());
 		}
 
-		GetWorldTimerManager().SetTimer(CastingTimer, this, &ABasicPlayer::CastingAttack, CastingSkill->GetGageIncreasingSpeed());
+		GetWorldTimerManager().SetTimer(CastingTimer, this, &ABasicPlayer::CastingAttack, CastingSkill->GetExcuteTime(0.0f));
 	}
 }
 
 void ABasicPlayer::CastingAttack()
 {
-	if (CastingSkill)
+	PlayerController->RemoveSkillGage();
+
+	GetWorldTimerManager().ClearTimer(CastingTimer);
+
+	if (!HasAuthority())
 	{
-		PlayerController->RemoveSkillGage();
-
-		GetWorldTimerManager().ClearTimer(CastingTimer);
-
-		if (!HasAuthority())
-		{
-			ServerPlayMontage(CastingSkill->SkillMontage, FName("Attack"), CastingSkill->AnimPlaySpeeds[1]);
-			ServerSpawnParticle(CastingSkill->SkillParticles[1], GetActorLocation(), GetActorRotation());
-			ServerPlaySound(CastingSkill->SkillSounds[0]);
-			ServerApplyDamageBasic(CastingSkill->SkillDamage, CastingSkill->AttackDistance, CastingSkill->AttackRadius);
-		}
-		CastingSkill->ApplyCoolDown();
-
-		MPComponent->ReduceMana(CastingSkill->GetRequireMana());
+		ServerPlayMontage(CastingSkill->SkillMontage, FName("Attack"), CastingSkill->AnimPlaySpeeds[1]);
+		ServerSpawnParticle(CastingSkill->SkillParticles[1], GetActorLocation(), GetActorRotation());
+		ServerPlaySound(CastingSkill->SkillSounds[0]);
+		ServerApplyDamageBasic(CastingSkill->SkillDamage, CastingSkill->AttackDistance, CastingSkill->AttackRadius);
 	}
+	CastingSkill->ApplyCoolDown();
+
+	MPComponent->ReduceMana(CastingSkill->GetRequireMana());
 }
 
 void ABasicPlayer::FreezeAttack()
 {
-	if(CharacterStatus == ECharacterStatus::ECS_Normal && FreezeSkill->IsAvailable())
+	if (CharacterStatus == ECharacterStatus::ECS_Normal && FreezeSkill->IsAvailable())
 	{
 		CharacterStatus = ECharacterStatus::ECS_Attack;
 
-		if(!HasAuthority())
+		if (!HasAuthority())
 		{
 			ServerPlayMontage(FreezeSkill->SkillMontage, FName("Freeze"), FreezeSkill->AnimPlaySpeeds[0]);
 			ServerApplyDamageBasic(FreezeSkill->SkillDamage, FreezeSkill->AttackDistance, FreezeSkill->AttackRadius);

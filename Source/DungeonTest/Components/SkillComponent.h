@@ -47,16 +47,11 @@ protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
 
-	float DeltaTime;
-
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Skill")
 	float CoolDown;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Skill")
 	float CoolState;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Skill")
-	float CoolValue;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Skill")
 	float MaxGage;
@@ -67,7 +62,7 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Skill")
 	float GageIncreasingSpeed;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Skill")
+	UPROPERTY(VisibleAnywhere, Category = "Skill")
 	float GageValue;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Skill")
@@ -107,6 +102,7 @@ public:
 
 	FORCEINLINE int32 GetGageLoops() { return GageLoops; }
 
-protected:
-	void GageInit();
+	FORCEINLINE float GetReverse(float Value) { return 1.f / Value; }
+
+	FORCEINLINE float GetExcuteTime(float AddValue) { return GetReverse(GageIncreasingSpeed) * GageLoops + AddValue; }
 };
