@@ -62,25 +62,8 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "State")
 	EAttackStatus AttackStatus;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Animation")
-	UAnimInstance* AnimInstance;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Animation")
-	UAnimMontage* BeginMontage;
-
-	UPROPERTY(EditDefaultsOnly, Category = "Animation")
-	UParticleSystem* BeginParticle;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Animation") // To do: 기본 공격도 스킬과 같은 형태로 전환하는 것이 좋을 듯 해보인다.
-	UAnimMontage* BasicAttackMontage;
-
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animation")
 	bool bPermitAttack;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Animation")
-	UAnimMontage* DeathMontage;
-
-	TArray<AActor*> AttackIgnoreActor; // ApplyRadialDamage에 한정된 멤버 변수이므로 HealthComponent에 IsFriend와 같은 함수를 추가하는 방향으로 가는 것이 좋을 것 같다.
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Controller")
 	class ABasicPlayerController* PlayerController;
@@ -97,24 +80,11 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Attack")
 	float BasicDamage;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Skill")
-	USkillComponent* ChargeSkill;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Skill")
-	USkillComponent* CastingSkill;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Skill")
-	USkillComponent* EvadeSkill;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Skill")
-	USkillComponent* FreezeSkill;
+	TArray<AActor*> AttackIgnoreActor; // ApplyRadialDamage에 한정된 멤버 변수이므로 HealthComponent에 IsFriend와 같은 함수를 추가하는 방향으로 가는 것이 좋을 것 같다.
 
 	FTimerHandle ChargeTimer;
 
 	FTimerHandle CastingTimer;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Sound")
-	USoundCue* BasicAttackSound;
 
 public:	
 	// Called every frame
@@ -127,20 +97,6 @@ protected:
 	void MoveForward(float Value);
 
 	void MoveRight(float Value);
-
-	void BasicAttack();
-
-	void Charging();
-
-	void ChargeAttack();
-
-	void CastingKeyDown();
-
-	void CastingStart();
-
-	void CastingAttack();
-
-	void FreezeAttack();
 
 	UFUNCTION(Server, Reliable, WithValidation, BlueprintCallable)
 	void ServerPlayMontage(UAnimMontage* AnimMontage, FName SectionName, float PlaySpeed);
@@ -168,15 +124,13 @@ protected:
 	FVector GetAttackRangeFromFront(float Distance);
 
 	UFUNCTION()
-	void OnHealthChanged(UHealthComponent* OwnerHealthComponent, float Health, float HealthDelta, const UDamageType* DamageType, AController* InstigatedBy, AActor* DamageCauser);
+	virtual void OnHealthChanged(UHealthComponent* OwnerHealthComponent, float Health, float HealthDelta, const UDamageType* DamageType, AController* InstigatedBy, AActor* DamageCauser);
 
 	UFUNCTION(Server, Reliable, WithValidation)
 	void ServerSetActorRotation(FRotator NewRotation);
 
 	UFUNCTION(NetMulticast, Reliable, WithValidation)
 	void MulticastSetActorRotation(FRotator NewRotation);
-
-	void Evade();
 
 	UFUNCTION(Server, Reliable, WithValidation)
 	void ServerLaunchCharacter();
