@@ -4,7 +4,7 @@
 #include "BasicEnemy.h"
 
 #include "AIController.h"
-#include "BasicPlayer.h"
+#include "CharacterBase/BasicPlayer.h"
 #include "DrawDebugHelpers.h"
 #include "EngineUtils.h"
 #include "Components/HealthComponent.h"
@@ -12,8 +12,8 @@
 #include "GameFramework/PawnMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Sound/SoundCue.h"
-#include "BasicPlayerController.h"
-#include "BasicPlayer.h"
+#include "CharacterBase/BasicPlayerController.h"
+#include "CharacterBase/BasicPlayer.h"
 #include "Animation/AnimInstance.h"
 
 // Sets default values

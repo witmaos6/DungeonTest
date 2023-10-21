@@ -3,7 +3,7 @@
 
 #include "BossEnemy.h"
 
-#include "BasicPlayerController.h"
+#include "CharacterBase/BasicPlayerController.h"
 #include "EngineUtils.h"
 #include "Components/HealthComponent.h"
 #include "Blueprint/UserWidget.h"
@@ -13,7 +13,7 @@
 #include "GameFramework/PawnMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Sound/SoundCue.h"
-#include "BasicPlayer.h"
+#include "CharacterBase/BasicPlayer.h"
 #include "Animation/AnimInstance.h"
 
 // Sets default values

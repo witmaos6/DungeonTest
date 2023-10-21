@@ -3,14 +3,14 @@
 
 #include "BasicPlayer.h"
 
-#include "BasicEnemy.h"
+#include "DungeonTest/BasicEnemy.h"
 #include "BasicPlayerController.h"
 #include "Camera/CameraComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
-#include "Components/HealthComponent.h"
-#include "Components/MPComponent.h"
-#include "Components/SkillComponent.h"
+#include "DungeonTest/Components/HealthComponent.h"
+#include "DungeonTest/Components/MPComponent.h"
+#include "DungeonTest/Components/SkillComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Engine/SkeletalMeshSocket.h"
 #include "Kismet/GameplayStatics.h"

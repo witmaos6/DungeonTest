@@ -4,7 +4,7 @@
 #include "BasicPlayerController.h"
 
 #include "Blueprint/UserWidget.h"
-#include "Widget/SkillGageWidget.h"
+#include "DungeonTest/Widget/SkillGageWidget.h"
 
 void ABasicPlayerController::BeginPlay()
 {
